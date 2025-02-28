@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slideshow</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background-color: #d3d3d3; /* Light gray background color */
+        }
+        #loading-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        #loading {
+            width: 50px;
+            height: 50px;
+        }
+        #image-container {
+            position: relative;
+            width: 80vw;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #image {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        #no-image-message {
+            display: none;
+            font-size: 18px; /* Smaller font size */
+            font-weight: bold;
+        }
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(173, 216, 230, 0.7); /* Light blue with transparency */
+            color: white;
+            border: none;
+            padding: 3px 8px; /* Smaller button size */
+            cursor: pointer;
+            font-size: 16px; /* Smaller font size */
+            border-radius: 50%; /* Make buttons round */
+            width: 30px; /* Set width for round shape */
+            height: 30px; /* Set height for round shape */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #prev-button {
+            left: 10px; /* Adjust spacing from the left edge */
+        }
+        #next-button {
+            right: 10px; /* Adjust spacing from the right edge */
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-container">
+        <img id="loading" src="loading.gif" alt="Loading...">
+    </div>
+    <div id="image-container">
+        <img id="image" src="" alt="Image">
+        <div id="no-image-message">表示する画像がありません</div>
+        <button id="prev-button" class="nav-button" onclick="previousImage()">◀</button>
+        <button id="next-button" class="nav-button" onclick="nextImage()">▶</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 100;
+        let loadingTimeout;
+
+        function showLoading() {
+            document.getElementById('loading-container').style.display = 'flex';
+            document.getElementById('no-image-message').style.display = 'none';
+            document.getElementById('image').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-container').style.display = 'none';
+        }
+
+        function handleImageError() {
+            // If image fails to load, show no image message
+            document.getElementById('image').style.display = 'none';
+            document.getElementById('no-image-message').style.display = 'block';
+            hideLoading();
+        }
+
+        function loadImage(page) {
+            showLoading();
+            clearTimeout(loadingTimeout); // Clear previous timeout if exists
+            loadingTimeout = setTimeout(() => {
+                const imageElement = document.getElementById('image');
+                const noImageMessageElement = document.getElementById('no-image-message');
+                imageElement.src = `images/page${page}.jpg`;
+                imageElement.onload = () => {
+                    imageElement.style.display = 'block';
+                    noImageMessageElement.style.display = 'none';
+                    hideLoading();
+                };
+                imageElement.onerror = handleImageError;
+            }, 700);
+        }
+
+        function previousImage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadImage(currentPage);
+            }
+        }
+
+        function nextImage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadImage(currentPage);
+            }
+        }
+
+        window.onload = () => {
+            loadImage(currentPage);
+        }
+    </script>
+</body>
+</html>
